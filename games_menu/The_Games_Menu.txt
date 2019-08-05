@@ -1,0 +1,54 @@
+THE GAMES MENU
+==============
+
+Files:
+
+MENU.ssd
+========
+
+Disk image containing the program itself.
+
+Use: *MENU [Optional Switches]
+
+e.g.
+
+*MENU -DA -P
+
+"-DA" selects dataset A.DATA etc.
+default is D.DATA
+
+"-P" Prompt on (with MMB dfs).
+Default is off if using MMB dfs.
+
+Two datasets are present, both based on the STH collection,
+D.DATA is the full collection.
+
+Disk also contains CHE00 for "chaining" BASIC
+programs at Page &E.
+
+MakeGamesData.exe
+=================
+
+Creates a dataset file for use with MENU.
+
+Source files are text files, fields deliminated with TAB's (chr.9) and records deliminated with CR's (chr.13).  Chrs.<&20 or >=&127 are ignored, thus ViewStore files can be used.
+
+Field order:
+1) House Name
+2) Game Title
+3) Filename
+4) Execution: blank/C=Chain, R=*RUN, E=*EXEC
+5) Page in hex (blank=&19)
+6) Disk Title
+7) Disk Side (0 or 1)
+8) Disk Type (S=Single Sided else Double Sided)
+
+D.GAMESDB.TXT is an example.
+
+GamesDB.mdb
+===========
+
+An MS Access 2000 database.  Contains dataset for STH collection.  Uses MakeGamesData.exe to create data file.
+
+
+MM 01/11/06

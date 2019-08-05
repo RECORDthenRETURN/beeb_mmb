@@ -1,0 +1,1077 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <style type="text/css">
+    h1 {color: #221122}
+    h2 {color: #113355}
+    body {font-family: arial, "lucida console", sans-serif }
+    span.basic_comment { color:#777777 }
+    span.assem_comment { color:#777777 }
+    span.struct { color:#880000 }
+    span.fornext { color:#880088 }
+    span.loop { color:#880088 }
+    span.ifthen { color:#008800 }
+    span.linenumber { color:#008888 }
+    span.control_CHARS { color:#004488 }
+    </style>
+    <meta name="generator" content="bbclist 0.11 by W.H.Scholten">
+    <title>BBC basic program "M14"</title>
+  </head>
+  <body>
+
+<pre>
+
+   10<b>REM</b><span class="basic_comment"> MENU1 10/5/06</span>
+   20<b>REM</b><span class="basic_comment"> by Martin Mather</span>
+   30:
+   40<b>MODE</b> 7
+   50*DIN0
+   60*KEY1*DIN0|M*BE|M
+   70:
+   80TEST%=0
+   90ldaddr%=&amp;7C00-&amp;1000
+  100:
+  110dspc%=&amp;3D0
+  120dspc%=&amp;200
+  130:
+  140wdata%=&amp;900
+  150<b><span class="ifthen">IF</span></b> TEST% <b><span class="struct">PROC</span></b>dimdata
+  160:
+  170brkv=&amp;202
+  180txtptr=&amp;F2
+  190beL=?brkv:beH=brkv?1
+  200gsinit=&amp;FFC2:gsread=&amp;FFC5
+  210oswrch=&amp;FFEE:osnewl=&amp;FFE7
+  220osrdch=&amp;FFE0:osfile=&amp;FFDD
+  230osfind=&amp;FFCE:osargs=&amp;FFDA
+  240oscli=&amp;FFF7:osbyte=&amp;FFF4
+  250:
+  260argsblk%=&amp;90
+  270fileblk%=&amp;90
+  280din%=wdata%
+  290dname%=din%+7
+  300fname%=dname%+12+2
+  310pdata%=fname%+10
+  320ploc1%=pdata%+25
+  330ploc2%=ploc1%+25
+  340:
+  350padchr%=<b>ASC</b>(" ")
+  360topline%=2
+  370maxlines%=25-topline%
+  380scrn%=&amp;7C00
+  390errp%=scrn%+40*12+3
+  400linem%=scrn%+40*topline%
+  410prtdn%=scrn%+40*3+10
+  420prtfn%=scrn%+40*7+10
+  430prtds%=scrn%+40*5+9
+  440prtpg%=scrn%+40*10+19
+  450pgno%=8
+  460:
+  470inkw%=100
+  480:
+  490chr0%=<b>ASC</b>("0"):chr9%=<b>ASC</b>("9")
+  500chrA%=<b>ASC</b>("A"):chrZ%=<b>ASC</b>("Z")
+  510chra%=<b>ASC</b>("a"):chrz%=<b>ASC</b>("z")
+  520:
+  530<b><span class="struct">PROC</span></b>vars:<b><span class="struct">PROC</span></b>ass
+  540:
+  550<b><span class="ifthen">IF</span></b> TEST%&gt;0 <b>GOTO</b> <b><span class="linenumber">640</span></b>
+  560<b>OSCLI</b> "*SAVE MENU "+<b>STR$</b>~(CODE%)+" "+<b>STR$</b>~(O%)+" "+<b>STR$</b>~(ldaddr%)+" "+<b>STR$</b>~(ldaddr%)
+  570<b>END</b>
+  580:
+  590<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>dimdata
+  600<b>DIM</b> datalo% dspc%:datasz%=dspc%
+  610wdata%=&amp;900:<b>REM</b><span class="basic_comment"> ZP</span>
+  620<b><span class="struct">ENDPROC</span></b>
+  630:
+  640<b>REM</b><span class="basic_comment"></span>
+  650:
+  660<b>ON</b> <b>ERROR</b> <b>GOTO</b> <b><span class="linenumber">740</span></b>
+  670:
+  680<b>CLS</b>
+  690<b>INPUT</b> "ARGS ";I$
+  700$&amp;900=I$:X%=0:Y%=9
+  710<b>CALL</b> startup
+  720<b>INPUT</b> A$,B$:<b>PRINT</b> "END!":<b>END</b>
+  730:
+  740<b>REM</b><span class="basic_comment"> EXIT</span>
+  750:
+  760<b>PRINT</b> <b>TAB</b>(0,10)
+  770<b>REPORT</b>:<b>PRINT</b> " AT LINE ";<b>ERL</b>
+  780<b>ON</b> <b>ERROR</b> <b>OFF</b>
+  790*FX 4,0
+  800<b>END</b>
+  810:
+  820:
+  830<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>w(a%,w%):?a%=w% <b>MOD</b> 256:a%?1=w% <b>DIV</b> 256:<b><span class="struct">ENDPROC</span></b>
+  840<b><span class="struct">DEF</span></b> <b><span class="struct">FN</span></b>w(a%)=!a% <b>AND</b> &amp;FFFF
+  850:
+  860<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>vars
+  870L%=&amp;70
+  880<b><span class="ifthen">IF</span></b> TEST%=0 L%=0
+  890cc_b%=<b><span class="struct">FN</span></b>v(1):col_b%=<b><span class="struct">FN</span></b>v(1)
+  900ptr_w%=<b><span class="struct">FN</span></b>v(2):data_w%=<b><span class="struct">FN</span></b>v(2)
+  910pp_b%=<b><span class="struct">FN</span></b>v(1):hi_b%=<b><span class="struct">FN</span></b>v(1)
+  920phi_b%=<b><span class="struct">FN</span></b>v(1):g_b%=<b><span class="struct">FN</span></b>v(1)
+  930ll_b%=<b><span class="struct">FN</span></b>v(1):lu_b%=<b><span class="struct">FN</span></b>v(1)
+  940ic_b%=<b><span class="struct">FN</span></b>v(1):temp_w%=<b><span class="struct">FN</span></b>v(2)
+  950gg_b%=<b><span class="struct">FN</span></b>v(1):runopt_b%=<b><span class="struct">FN</span></b>v(1)
+  960no_b%=<b><span class="struct">FN</span></b>v(1)
+  970runpage_w%=<b><span class="struct">FN</span></b>v(2)
+  980menuopt_b%=<b><span class="struct">FN</span></b>v(1)
+  990pagetitles_w%=<b><span class="struct">FN</span></b>v(2)
+ 1000pagefiles_w%=<b><span class="struct">FN</span></b>v(2)
+ 1010sptr=<b><span class="struct">FN</span></b>v(1)
+ 1020<b>PRINT</b> "Next var = "; ~L%:<b><span class="struct">ENDPROC</span></b>
+ 1030:
+ 1040<b><span class="struct">DEF</span></b> <b><span class="struct">FN</span></b>v(Z%):L%=L%+Z%:=L%-Z%
+ 1050:
+ 1060<b><span class="struct">DEF</span></b> <b><span class="struct">FN</span></b>loadscrn
+ 1070<b><span class="ifthen">IF</span></b> (o% <b>AND</b> 4) <b><span class="ifthen">THEN</span></b> I%=O% <b><span class="ifthen">ELSE</span></b> I%=P%
+ 1080X%=<b>OPENIN</b>("D.SCRDATA")
+ 1090<b><span class="ifthen">IF</span></b> X%=0 <b>PRINT</b>"NO SCRN DATA":<b>END</b>
+ 1100pic%=<b>BGET</b>#X%:cb%=<b>BGET</b>#X%
+ 1110estrtab1=P%+cb%+2
+ 1120estrtab2=estrtab1+pic%
+ 1130ES1%=I%+cb%+2:ES2%=ES1%+pic%
+ 1140j%=<b>EXT</b>#X%:<b>CLOSE</b> #X%
+ 1150<b><span class="ifthen">IF</span></b> o%&lt;2 <b>GOTO</b> <b><span class="linenumber">1220</span></b>
+ 1160<b>PRINT</b> "LOAD SCRN ";~I%;" ";~P%
+ 1170<b>OSCLI</b> "*L.D.SCRDATA "+<b>STR$</b>~(I%)
+ 1180<b><span class="fornext">FOR</span></b> X%=0 <b><span class="fornext">TO</span></b> pic%-1
+ 1190L%=P%+ES1%?X%+ES2%?X%*256
+ 1200ES1%?X%=<b><span class="struct">FN</span></b>lb(L%):ES2%?X%=hb:<b><span class="fornext">NEXT</span></b>
+ 1210O%=O%+j%
+ 1220P%=P%+j%:=o%
+ 1230:
+ 1240<b><span class="struct">DEF</span></b> <b><span class="struct">FN</span></b>vecs
+ 1250L%=10:veccount=L%
+ 1260<b><span class="ifthen">IF</span></b> o%&lt;2 <b>GOTO</b> <b><span class="linenumber">1400</span></b>
+ 1270<b><span class="ifthen">IF</span></b> o% <b>AND</b> 4 <b><span class="ifthen">THEN</span></b> I%=O% <b><span class="ifthen">ELSE</span></b> I%=P%
+ 1280<b>DATA</b> 0,az,0,num
+ 1290<b>DATA</b> &amp;88,left,&amp;89,right
+ 1300<b>DATA</b> &amp;8B,up,&amp;8A,down
+ 1310<b>DATA</b> &amp;3F,phelp,13,gogame,9,tab
+ 1320<b>DATA</b> &amp;87,toginfo
+ 1330<b>RESTORE</b> <b><span class="linenumber">1280</span></b>
+ 1340<b><span class="fornext">FOR</span></b> X%=0 <b><span class="fornext">TO</span></b> L%-1
+ 1350<b>READ</b> Y%,Z$:Z%=<b>EVAL</b>(Z$)
+ 1360<b>PRINT</b>~Y%,~Z%
+ 1370I%?X%=Y%:I%?(X%+L%)=<b><span class="struct">FN</span></b>lb(Z%-1)
+ 1380I%?(X%+L%+L%)=hb:<b><span class="fornext">NEXT</span></b>
+ 1390O%=O%+L%*3
+ 1400P%=P%+L%*3:=o%
+ 1410:
+ 1420<b><span class="struct">DEF</span></b> <b><span class="struct">FN</span></b>lb(w%):hb=w% <b>DIV</b> 256:=w% <b>MOD</b> 256
+ 1430<b><span class="struct">DEF</span></b> <b><span class="struct">FN</span></b>err(e$):[OPT o%:BRK:EQUB 255:EQUS e$:BRK:]:=o%
+ 1440:
+ 1450:
+ 1460<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass
+ 1470:
+ 1480codeo%=3
+ 1490so%=0
+ 1500:
+ 1510CODE%=0:CODEZ%=&amp;1000
+ 1520<b><span class="ifthen">IF</span></b> TEST%&gt;0 <b>GOTO</b> <b><span class="linenumber">1590</span></b>
+ 1530<b>DIM</b> CODE% CODEZ%
+ 1540codelo%=&amp;400:codeloz%=&amp;400
+ 1550code%=&amp;1300
+ 1560so%=4
+ 1570<b>GOTO</b> <b><span class="linenumber">1650</span></b>
+ 1580:
+ 1590codez%=1024*1.35
+ 1600codelo%=&amp;1300
+ 1610codeloz%=&amp;600
+ 1620<b><span class="ifthen">IF</span></b> <b>PAGE</b>=&amp;800 <b>DIM</b> codelo% codeloz%
+ 1630<b>DIM</b> code% codez%
+ 1640:
+ 1650<b><span class="fornext">FOR</span></b> o%=so% <b><span class="fornext">TO</span></b> so%+codeo% <b><span class="fornext">STEP</span></b> codeo%
+ 1660<b>PRINT</b> o%
+ 1670:
+ 1680O%=CODE%
+ 1690:
+ 1700P%=codelo%
+ 1710[OPT o%:JMP startup
+ 1720.estrdata OPT <b><span class="struct">FN</span></b>loadscrn:]:<b>PRINT</b> "SCR DATA ",P%-estrdata
+ 1730<b><span class="struct">PROC</span></b>ass_pestr:<b><span class="struct">PROC</span></b>ass_gen
+ 1740<b><span class="struct">PROC</span></b>ass_gen2:<b><span class="struct">PROC</span></b>ass_gen3
+ 1750<b><span class="ifthen">IF</span></b> TEST%&gt;0 <b><span class="struct">PROC</span></b>ass_file:<b><span class="struct">PROC</span></b>ass_pstr
+ 1760:
+ 1770<b><span class="ifthen">IF</span></b> P%&gt;=codelo%+codeloz% <b>PRINT</b> "CODE LOW OVFLW":<b>END</b>
+ 1780<b>PRINT</b> "CodeLo ";codeloz%-(P%-codelo%);" free"
+ 1790:
+ 1800P%=code%
+ 1810hiO%=O%-CODE%+ldaddr%
+ 1820<b><span class="struct">PROC</span></b>ass_bas
+ 1830<b><span class="struct">PROC</span></b>ass_run
+ 1840<b><span class="ifthen">IF</span></b> TEST%=0 <b><span class="struct">PROC</span></b>ass_file:<b><span class="struct">PROC</span></b>ass_pstr
+ 1850<b><span class="struct">PROC</span></b>ass_page
+ 1860<b><span class="struct">PROC</span></b>ass_gogame
+ 1870<b><span class="struct">PROC</span></b>ass_core
+ 1880hiP%=((P%-code%) <b>DIV</b> 256)+1
+ 1890:
+ 1900H%=P%:loc_w%=wchr+1
+ 1910<b><span class="ifthen">IF</span></b> TEST%=0 datalo%=P%:datasz%=&amp;7C00-P%:<b>GOTO</b> <b><span class="linenumber">1940</span></b>
+ 1920<b><span class="ifthen">IF</span></b> P%&gt;code%+codez% <b>PRINT</b> "Code overflow!":<b>END</b>
+ 1930:
+ 1940<b><span class="ifthen">IF</span></b> TEST%&gt;0 P%=datalo% <b><span class="ifthen">ELSE</span></b> P%=ldaddr%+O%-CODE%
+ 1950<b><span class="struct">PROC</span></b>ass_sup
+ 1960:
+ 1970pgc_b%=datalo%
+ 1980pgcbcd_w%=datalo%+1 
+ 1990tabl%=datalo%+&amp;10
+ 2000<b><span class="fornext">NEXT</span></b>
+ 2010:
+ 2020<b><span class="ifthen">IF</span></b> TEST%&gt;0 G=<b>GET</b>:<b><span class="struct">ENDPROC</span></b>
+ 2030<b>PRINT</b> "CODE ";~CODE%;" TO ";~O%
+ 2040<b>PRINT</b> "SIZE =";O%-CODE%;" bytes"
+ 2050<b><span class="struct">ENDPROC</span></b>
+ 2060:
+ 2070:
+ 2080<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_pstr:T%=P%:[OPT o%
+ 2090:
+ 2100.pstrSkip
+ 2110TYA:PHA:TXA:PHA:LDA wchr:PHA
+ 2120LDA #&amp;60 <span class="assem_comment">\ RTS</span>
+ 2130STA wchr:JSR pstr_S:PLA:STA wchr
+ 2140PLA:TAX:PLA:TAY:RTS
+ 2150:
+ 2160.pstrTerm <span class="assem_comment">\ Y=max len &gt;0 &lt;&amp;80</span>
+ 2170LDA loc_w%:STA temp_w%
+ 2180LDA loc_w%+1:STA temp_w%+1
+ 2190STY maxl+1:LDY #&amp;FF:JSR pstr_T
+ 2200LDY cc_b%:CPY maxl+1
+ 2210BCC pstrT_5:LDY maxl+1
+ 2220.pstrT_5 <span class="assem_comment">\ trim</span>
+ 2230DEY:LDA #32
+ 2240.pstrT_6
+ 2250CMP (temp_w%),Y:BNE pstrT_7
+ 2260DEY:BPL pstrT_6
+ 2270:
+ 2280.pstrT_7
+ 2290INY:STY cc_b%:LDA #&amp;0D
+ 2300STA (temp_w%),Y:DEY:BMI pstrT_4
+ 2310:
+ 2320.pstrT_1
+ 2330LDA (temp_w%),Y:CMP #95
+ 2340BNE pstrT_2:LDA #35:BNE pstrT_3
+ 2350.pstrT_2
+ 2360CMP #35:BNE pstrT_3:LDA #96 <span class="assem_comment">\ `</span>
+ 2370.pstrT_3
+ 2380STA (temp_w%),Y:DEY:BPL pstrT_1
+ 2390:
+ 2400.pstrT_4
+ 2410LDY cc_b%:RTS <span class="assem_comment">\ Y=len</span>
+ 2420:
+ 2430:
+ 2440.pstr
+ 2450STA col_b%:JSR wchr:INC ll_b%
+ 2460:
+ 2470.pstr_S
+ 2480LDY #&amp;FF:STY maxl+1:INY
+ 2490:
+ 2500.pstr_T
+ 2510STY termb+1
+ 2520LDY #0:STY cc_b%:LDX #&amp;FF
+ 2530:
+ 2540.pstr_3
+ 2550INX:LDA (ptr_w%),Y
+ 2560AND #&amp;F:BEQ pstr_1
+ 2570:
+ 2580JSR pchr:BCS pstr_x
+ 2590:
+ 2600.pstr_1
+ 2610INX:LDA (ptr_w%),Y:LSR A:LSR A
+ 2620LSR A:LSR A:BEQ pstr_2
+ 2630:
+ 2640JSR pchr:BCS pstr_x
+ 2650:
+ 2660.pstr_2 INY:LDA cc_b%
+ 2670.maxl CMP #&amp;FF:BCC pstr_3
+ 2680:
+ 2690.pstr_x
+ 2700SEC:TYA:ADC ptr_w%:STA ptr_w%
+ 2710LDA ptr_w%+1:ADC #0:STA ptr_w%+1
+ 2720:
+ 2730LDA termb+1:BNE pstrT_4
+ 2740:
+ 2750LDY #1:LDA #20:LDX ll_b%
+ 2760CPX #21:BCC pstr_12 <span class="assem_comment">\ &lt;=20?</span>
+ 2770INY:LDA #60:.pstr_12 JMP ppad
+ 2780:
+ 2790:
+ 2800.pchrtab1
+ 2810EQUD &amp;30201000:EQUD &amp;70605040
+ 2820:
+ 2830.pchr
+ 2840ORA pchrtab1,X
+ 2850CMP #&amp;01:BEQ pchr_x <span class="assem_comment">\ C=1</span>
+ 2860:
+ 2870TAX
+ 2880.pchrtab2 LDA &amp;FFFF,X
+ 2890:
+ 2900.pchr2 JSR wchr
+ 2910.termb LDA #0:BNE pchr_3
+ 2920:
+ 2930LDX ll_b%:INX:CPX #40:BNE pchr_2
+ 2940LDA #44:JSR ppad2:LDA col_b%
+ 2950JSR wchr:INX
+ 2960.pchr_2 STX ll_b%
+ 2970.pchr_3 LDX #&amp;FF:CLC
+ 2980.pchr_x RTS
+ 2990:
+ 3000.ppad LDX ll_b%
+ 3010.ppad2 STA ppad_2+1
+ 3020.ppad_1 LDA #padchr%
+ 3030.ppad_2 CPX #&amp;FF:BEQ ppad_4
+ 3040CPX #40:BNE ppad_3:JSR phi
+ 3050INX:INX:BNE ppad_1 <span class="assem_comment">\ always</span>
+ 3060.ppad_3
+ 3070JSR wchr:INX:BNE ppad_2 <span class="assem_comment">\ always</span>
+ 3080.ppad_4 STX ll_b%:RTS
+ 3090:
+ 3100.phi
+ 3110LDA g_b%:CMP hi_b%:BNE phi_1
+ 3120LDA g_b%:STA phi_b%:LDA #145
+ 3130JSR wchr:LDA #157:JMP wchr
+ 3140.phi_1
+ 3150LDA #32:JSR wchr:JMP wchr
+ 3160:
+ 3170.wchr
+ 3180STA &amp;FFFF:INC wchr+1:BNE wchr_1
+ 3190INC wchr+2:.wchr_1:INC cc_b%:RTS
+ 3200:
+ 3210.rehi
+ 3220LDA #32:STA hhi_1+1:STA hhi_2+1
+ 3230LDY phi_b%:JSR hhi2
+ 3240:
+ 3250LDY hi_b%:CPY g_b%:BCC rehi_1
+ 3260LDY g_b%:DEY
+ 3270.rehi_1 LDA #145:STA hhi_1+1
+ 3280LDA #157:STA hhi_2+1
+ 3290:
+ 3300.hhi
+ 3310STY phi_b%
+ 3320.hhi2
+ 3330LDA ploc1%,Y:STA temp_w%
+ 3340LDA ploc2%,Y:STA temp_w%+1
+ 3350LDA pdata%,Y
+ 3360LDY #0:CMP #1:BEQ hhi_1
+ 3370JSR hhi_1:LDY #40
+ 3380.hhi_1
+ 3390LDA #145:STA (temp_w%),Y:INY
+ 3400.hhi_2
+ 3410LDA #157:STA (temp_w%),Y:RTS
+ 3420:
+ 3430]:<b>PRINT</b> "pstr",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 3440:
+ 3450<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_page:T%=P%:[:OPT o%
+ 3460:
+ 3470.page <span class="assem_comment">\ Y=pageno</span>
+ 3480:
+ 3490LDY pp_b%:DEY:CLC
+ 3500.tab_1 LDA tabl%,Y
+ 3510ADC data_w%:STA ptr_w%
+ 3520.tab_2 LDA &amp;FFFF,Y
+ 3530ADC data_w%+1:STA ptr_w%+1
+ 3540:
+ 3550LDY #0:STY g_b%:STY lu_b%
+ 3560:
+ 3570LDA #<b><span class="struct">FN</span></b>lb(linem%):STA loc_w%
+ 3580LDA #hb:STA loc_w%+1
+ 3590:
+ 3600LDY #&amp;FF:LDX #0
+ 3610.page_loop1
+ 3620INX:CPX #(maxlines%+1) <span class="assem_comment">\ check</span>
+ 3630BEQ page_exloop1
+ 3640INY:CLC:LDA (ptr_w%),Y <span class="assem_comment">\ L</span>
+ 3650ADC data_w%:STA ploc1%-1,X:INY
+ 3660LDA (ptr_w%),Y <span class="assem_comment">\ H</span>
+ 3670ADC data_w%+1:STA ploc2%-1,X
+ 3680BPL page_loop1
+ 3690AND #&amp;7F:STA ploc2%-1,X
+ 3700.page_exloop1
+ 3710:
+ 3720INY:TYA:LDY ptr_w%+1
+ 3730CLC:ADC ptr_w%:STA ptr_w%
+ 3740STA pagetitles_w%:BCC page_20:INY
+ 3750.page_20
+ 3760STY ptr_w%+1:STY pagetitles_w%+1
+ 3770:
+ 3780STX ic_b%:LDY #0
+ 3790.page_loop2
+ 3800:
+ 3810LDA ploc1%,Y:STA houseloc1+1
+ 3820LDA ploc2%,Y:STA houseloc2+1
+ 3830:
+ 3840LDA loc_w%:STA ploc1%,Y
+ 3850LDA loc_w%+1:STA ploc2%,Y
+ 3860:
+ 3870STY g_b% <span class="assem_comment">\?</span>
+ 3880:
+ 3890JSR phi:LDA #130:JSR wchr
+ 3900TYA:CLC:ADC #65:JSR wchr
+ 3910:
+ 3920LDA #4:STA ll_b%
+ 3930LDA #131:JSR pstr <span class="assem_comment">\ title</span>
+ 3940:
+ 3950TYA:LDY g_b%:STA pdata%,Y
+ 3960CLC:ADC lu_b%:STA lu_b%
+ 3970:
+ 3980LDA ptr_w%:PHA:LDA ptr_w%+1:PHA
+ 3990:
+ 4000CLC:.houseloc1 LDA #0:STA ptr_w%
+ 4010.houseloc2 LDA #0:STA ptr_w%+1
+ 4020:
+ 4030LDA #0:STA ll_b%
+ 4040LDA #134:JSR pstr <span class="assem_comment">\ house</span>
+ 4050:
+ 4060PLA:STA ptr_w%+1:PLA:STA ptr_w%
+ 4070:
+ 4080LDY g_b%:INY:STY g_b%
+ 4090CPY ic_b%:BNE page_loop2
+ 4100:
+ 4110.page_exloop
+ 4120:
+ 4130<span class="assem_comment">\ page no</span>
+ 4140LDY #1:LDA (ptr_w%),Y:TAX
+ 4150DEY:LDA (ptr_w%),Y:LDY #8:JSR pno
+ 4160:
+ 4170LDA ptr_w%:STA pagefiles_w%
+ 4180LDA ptr_w%+1:STA pagefiles_w%+1
+ 4190:
+ 4200LDY lu_b%:CPY #maxlines%
+ 4210BEQ page_2
+ 4220.page_4
+ 4230LDA #0:STA ll_b%:LDA #40:JSR ppad
+ 4240INY:CPY #maxlines%:BNE page_4
+ 4250:
+ 4260.page_2
+ 4270LDA hi_b%:CMP g_b%:BCC page_3 <span class="assem_comment">\ hi&lt;g</span>
+ 4280LDY g_b%:DEY:JMP hhi
+ 4290:
+ 4300.page_3 RTS
+ 4310]:tabl_w%=tab_1+1:tabh_w%=tab_2+1
+ 4320<b>PRINT</b> "page",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 4330:
+ 4340<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_gen:T%=P%:[OPT o%
+ 4350:
+ 4360.pno <span class="assem_comment">\ AX=bcd no</span>
+ 4370CMP #0:BEQ pno_1
+ 4380CLC:ADC #48:BNE pno_2
+ 4390.pno_1 LDA #32
+ 4400.pno_2 STA scrn%,Y:TXA
+ 4410LSR A:LSR A:LSR A:LSR A:BEQ pno_3
+ 4420CLC:ADC #48:BNE pno_4
+ 4430.pno_3 LDA #32
+ 4440.pno_4 STA scrn%+1,Y
+ 4450TXA:CLC:AND #&amp;F:ADC #48
+ 4460STA scrn%+2,Y:RTS
+ 4470:
+ 4480.dia_str
+ 4490EQUB 148:EQUB 157:EQUB 135
+ 4500:
+ 4510.dialog
+ 4520LDA #<b><span class="struct">FN</span></b>lb(scrn%):STA temp_w%
+ 4530LDA #hb:STA temp_w%+1
+ 4540:
+ 4550LDX #25:.dia_1 LDY #0:.dia_3
+ 4560LDA dia_str,Y:STA (temp_w%),Y
+ 4570INY:CPY #3:BNE dia_3:LDA #32
+ 4580.dia_2 STA (temp_w%),Y
+ 4590INY:CPY #40:BNE dia_2
+ 4600CLC:LDA temp_w%:ADC #40
+ 4610STA temp_w%:BCC dia_4:INC temp_w%+1
+ 4620.dia_4 DEX:BNE dia_1:RTS
+ 4630:
+ 4640]:<b>PRINT</b> "gen",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 4650:
+ 4660<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_pestr
+ 4670T%=P%:[OPT o%
+ 4680:
+ 4690.pestr CPX #pic%:BCS pe_ex
+ 4700LDA #<b><span class="struct">FN</span></b>lb(estrdata+1)
+ 4710STA pchrtab2+1:LDA #hb:STA pchrtab2+2
+ 4720:
+ 4730LDA estrtab1,X:STA ptr_w%
+ 4740LDA estrtab2,X:STA ptr_w%+1
+ 4750:
+ 4760LDY #&amp;FF:STY maxl+1
+ 4770:
+ 4780.pe_2
+ 4790LDY #0:LDA (ptr_w%),Y:STA loc_w%
+ 4800INY:LDA (ptr_w%),Y:AND #&amp;7F
+ 4810STA loc_w%+1:CLC:LDA ptr_w%
+ 4820ADC #2:STA ptr_w%:BCC pe_1
+ 4830INC ptr_w%+1:.pe_1
+ 4840:
+ 4850LDY #&amp;FF:JSR pstr_T
+ 4860:
+ 4870LDY #1:LDA (ptr_w%),Y:BPL pe_2
+ 4880:
+ 4890.respct1 LDA #0:STA pchrtab2+1
+ 4900.respct2 LDA #0:STA pchrtab2+2
+ 4910.pe_ex RTS
+ 4920:
+ 4930]:<b>PRINT</b>"pestr",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 4940:
+ 4950<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_gen2:T%=P%:[OPT o%
+ 4960:
+ 4970.phelp JSR dialog:LDX #1:JSR pestr
+ 4980:
+ 4990.pressspc LDX #2:JSR pestr
+ 5000.phelp_1 JSR osrdch:BCS phelp_x
+ 5010CMP #32:BNE phelp_1
+ 5020.phelp_x JMP core1
+ 5030:
+ 5040.phead LDY #79:LDA #32
+ 5050.phead_1 STA scrn%,Y:DEY:BPL phead_1
+ 5060.phead_2 INY:LDA dia_str,Y:STA scrn%,Y
+ 5070CPY #2:BNE phead_2:LDX #0:JSR pestr
+ 5080LDY #15:LDA pgcbcd_w%:LDX pgcbcd_w%+1:JMP pno
+ 5090:
+ 5100]:<b>PRINT</b>"gen2",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 5110:
+ 5120<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_run:T%=P%:[OPT o%
+ 5130:
+ 5140.pagecmd EQUS "PA.=&amp;"
+ 5150.pagecmdno EQUS "1900":EQUB 13:BRK
+ 5160.chaincmd EQUS "CH.""":BRK
+ 5170.execcmd EQUS "*E. """:BRK
+ 5180.runcmd EQUS "*/""":BRK
+ 5190.drvcmd EQUS "DRIVE 0":EQUB 13
+ 5200.dincmd EQUS "DIN 0 """
+ 5210:
+ 5220.badstrerr OPT <b><span class="struct">FN</span></b>err("Bad string")
+ 5230:
+ 5240.runfile TSX:STX stackp2+1
+ 5250LDA #0:STA fatal+1:JSR clrkeyb
+ 5260:
+ 5270<span class="assem_comment">\ *DRIVE</span>
+ 5280BIT menuopt_b%:BPL usedrv0
+ 5290BIT runopt_b%:BVC usedrv0
+ 5300LDA #<b>ASC</b>("2"):STA drvcmd+6
+ 5310.usedrv0
+ 5320LDX #<b><span class="struct">FN</span></b>lb(drvcmd):LDY #hb:JSR oscli
+ 5330:
+ 5340BIT menuopt_b%:BMI skipdin
+ 5350:
+ 5360<span class="assem_comment">\ *DIN "</span>
+ 5370LDY #6:.din_1
+ 5380LDA dincmd,Y:STA din%,Y
+ 5390DEY:BPL din_1
+ 5400:
+ 5410.dsktlen LDY #&amp;FF
+ 5420:
+ 5430BIT runopt_b%:BMI runssd
+ 5440:
+ 5450CPY #11:BCS badstrerr
+ 5460LDA #<b>ASC</b>("-"):STA dname%,Y
+ 5470LDA runopt_b%:ROL A:ROL A
+ 5480LDA #<b>ASC</b>("0"):ADC #0
+ 5490STA dname%+1,Y:INY:INY
+ 5500:
+ 5510.runssd TYA:PHA
+ 5520LDA #<b>ASC</b>(""""):STA dname%,Y
+ 5530LDA #13:STA dname%+1,Y
+ 5540LDX #<b><span class="struct">FN</span></b>lb(din%):LDY #hb:JSR oscli
+ 5550PLA:TAY
+ 5560:
+ 5570BIT runopt_b%:BMI runssd_2
+ 5580:
+ 5590LDA #<b>ASC</b>("2") <span class="assem_comment">\ drive 2!</span>
+ 5600STA din%+4:LDA dname%-1,Y
+ 5610EOR #1:STA dname%-1,Y
+ 5620LDX #<b><span class="struct">FN</span></b>lb(din%):LDY #hb:JSR oscli
+ 5630:
+ 5640.runssd_2
+ 5650.skipdin
+ 5660JSR filelen <span class="assem_comment">\ check file exists</span>
+ 5670LDA runopt_b%:AND #&amp;3F
+ 5680BNE execorchain
+ 5690:
+ 5700<span class="assem_comment">\ *RUN</span>
+ 5710LDX #<b><span class="struct">FN</span></b>lb(runcmd):LDY #hb
+ 5720BNE inruncmd <span class="assem_comment">\ always</span>
+ 5730:
+ 5740.execorchain
+ 5750:
+ 5760<span class="assem_comment">\ insert PAGE cmd</span>
+ 5770:
+ 5780LDA runpage_w%::STA pagecmdno
+ 5790LDA runpage_w%+1:STA pagecmdno+1
+ 5800LDX #<b><span class="struct">FN</span></b>lb(pagecmd):LDY #hb
+ 5810JSR inkeyb0
+ 5820:
+ 5830LDA runopt_b%:AND #&amp;20
+ 5840BEQ chainfile
+ 5850:
+ 5860<span class="assem_comment">\ *EXEC</span>
+ 5870LDX #<b><span class="struct">FN</span></b>lb(execcmd):LDY #hb
+ 5880BNE inruncmd
+ 5890:
+ 5900.chainfile
+ 5910LDX #<b><span class="struct">FN</span></b>lb(chaincmd):LDY #hb
+ 5920:
+ 5930.inruncmd JSR inkeyb0
+ 5940:
+ 5950LDX #<b><span class="struct">FN</span></b>lb(fname%):LDY #hb:LDA #13
+ 5960JSR inquote
+ 5970:
+ 5980JSR mode7:JMP startbasic
+ 5990]:<b>PRINT</b> "run ",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 6000:
+ 6010<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_bas:T%=P%:[OPT o%
+ 6020:
+ 6030.basic EQUS "BASIC":EQUB 13
+ 6040:
+ 6050<span class="assem_comment">\ start BASIC</span>
+ 6060.startbasic
+ 6070LDA #4:LDX #0:JSR osbyte
+ 6080]:<b><span class="ifthen">IF</span></b> TEST%&lt;&gt;1 <b>GOTO</b> <b><span class="linenumber">6110</span></b>
+ 6090[OPT o%:LDA #beL:STA brkv:LDA #beH
+ 6100STA brkv+1:LDX sptr:TXS:RTS:]
+ 6110[OPT o%
+ 6120:
+ 6130LDX #4:STX &amp;81:LDA #0:STA &amp;80
+ 6140TAY:.clrl CPX #&amp;8:BCC clrd
+ 6150CPX #&amp;14:BCC clrs
+ 6160.clrd STA (&amp;80),Y:INY:BNE clrl
+ 6170.clrs INX:INC &amp;81:CPX #&amp;7C
+ 6171BNE clrl
+ 6180:
+ 6190.clrl2 STA &amp;00,Y:INY
+ 6200CPY #&amp;90:BNE clrl2
+ 6210:
+ 6220LDX #<b><span class="struct">FN</span></b>lb(basic)
+ 6230LDY #hb:JMP oscli
+ 6240:
+ 6250<span class="assem_comment">\ insert file/disk name</span>
+ 6260<span class="assem_comment">\ in to keyb</span>
+ 6270.inquote
+ 6280JSR inkeyb:LDY #<b>ASC</b>(""""):JSR osbyte
+ 6290LDY #13:JMP osbyte
+ 6300:
+ 6310.clrkeyb
+ 6320LDA #&amp;15:LDX #0:JMP osbyte
+ 6330:
+ 6340.inkeyb0 LDA #0
+ 6350.inkeyb
+ 6360STA ikb_term+1:STX ikb_loop+1
+ 6370STY ikb_loop+2:LDX #0:LDA #&amp;99
+ 6380.ikb_loop LDY pagecmd
+ 6390.ikb_term CPY #0:BEQ ikb_exit
+ 6400JSR osbyte
+ 6410INC ikb_loop+1:BNE ikb_loop
+ 6420INC ikb_loop+2:BNE ikb_loop
+ 6430.ikb_exit RTS
+ 6440:
+ 6450]:<b>PRINT</b> "bas",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 6460:
+ 6470<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_gen3
+ 6480T%=P%
+ 6490[OPT o%
+ 6500:
+ 6510.reporterr
+ 6520.fatal LDX #&amp;FF:BEQ re_1
+ 6530:
+ 6540JSR mode7:JMP re_1a
+ 6550:
+ 6560.re_1
+ 6570LDA menuopt_b%:AND #&amp;C0:BNE re_1a
+ 6580JSR dialog
+ 6590:
+ 6600.re_1a LDY #1
+ 6610.re_2 LDA (&amp;FD),Y:BEQ re_4
+ 6620LDX fatal+1:BEQ re_3
+ 6630JSR oswrch:INY:BNE re_2:BEQ re_4
+ 6640.re_3 STA errp%,Y:INY:BNE re_2
+ 6650:
+ 6660.re_4 LDX fatal+1:BNE re_F
+ 6670:
+ 6680LDA #129:STA errp%
+ 6690LDA #132:STA errp%,Y:STA errp%+40
+ 6700STA errp%+80
+ 6710:
+ 6720JSR pressspc
+ 6730:
+ 6740LDA #&amp;FF:STA fatal+1
+ 6750.stackp2 LDX #&amp;00:TXS:JMP core1
+ 6760:
+ 6770.re_F
+ 6780JSR osnewl:JMP startbasic
+ 6790:
+ 6800]:<b>PRINT</b> "gen3 ",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 6810:
+ 6820<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_gogame:T%=P%:[OPT o%
+ 6830:
+ 6840.gogame
+ 6850:
+ 6860LDX hi_b%:CPX g_b%:BCC gg_0
+ 6870LDX g_b%:DEX:.gg_0 STX gg_b%
+ 6880:
+ 6890<span class="assem_comment">\ ptr=pagefiles+ic*3+2</span>
+ 6900LDA ic_b%:ASL A:SEC:ADC ic_b%
+ 6910SEC:ADC pagefiles_w%:STA ptr_w%
+ 6920LDA pagefiles_w%+1:ADC #0
+ 6930STA ptr_w%+1
+ 6940:
+ 6950<span class="assem_comment">\ Get filename</span>
+ 6960LDX #0:LDY #2
+ 6970.gg_1 CPX gg_b%:BEQ gg_3
+ 6980LDA (pagefiles_w%),Y:BMI gg_2
+ 6990JSR pstrSkip
+ 7000.gg_2 INX:INY:INY:INY:BNE gg_1
+ 7010:
+ 7020.gg_3
+ 7030<span class="assem_comment">\ setup ptr to disk name &amp;</span>
+ 7040<span class="assem_comment">\ run opts</span>
+ 7050LDA (pagefiles_w%),Y
+ 7060PHA:AND #&amp;7F:PHA:INY
+ 7070CLC:LDA (pagefiles_w%),Y
+ 7080ADC data_w%:STA dskptr_1+1
+ 7090PLA:ADC data_w%+1:STA dskptr_2+1
+ 7100INY:LDA (pagefiles_w%),Y
+ 7110STA runopt_b%:PLA:BPL gg_6
+ 7120:
+ 7130<span class="assem_comment">\ fn blank so use title</span>
+ 7140LDA pagetitles_w%:STA ptr_w%
+ 7150LDA pagetitles_w%+1:STA ptr_w%+1
+ 7160LDX #0:.gg_4
+ 7170CPX gg_b%:BEQ gg_5:JSR pstrSkip
+ 7180INX:BNE gg_4 <span class="assem_comment">\ always!</span>
+ 7190:
+ 7200.gg_5 LDY #7:BNE gg_7
+ 7210:
+ 7220.gg_6 LDY #9
+ 7230.gg_7 LDA #<b><span class="struct">FN</span></b>lb(fname%):STA loc_w%
+ 7240LDA #hb:STA loc_w%+1:JSR pstrTerm
+ 7250:
+ 7260<span class="assem_comment">\ Get disk name</span>
+ 7270.dskptr_1 LDA #&amp;FF:STA ptr_w%
+ 7280.dskptr_2 LDA #&amp;FF:STA ptr_w%+1
+ 7290LDA #<b><span class="struct">FN</span></b>lb(dname%)
+ 7300STA loc_w%:STA ggprt+1
+ 7310LDA #hb:STA loc_w%+1:STA ggprt+2
+ 7320LDY #12:JSR pstrTerm:STY dsktlen+1
+ 7330:
+ 7340<span class="assem_comment">\ Set runpage</span>
+ 7350LDA runopt_b%:AND #&amp;3F
+ 7360STA runpage_w%:BEQ gg_8
+ 7370AND #&amp;1F:ASL A:TAY:LDX #1
+ 7380.gg_99 DEY:.pagetab LDA &amp;FFFF,Y
+ 7390STA runpage_w%,X:DEX:BPL gg_99
+ 7400:
+ 7410.gg_8
+ 7420LDA menuopt_b%:AND #&amp;C0:BEQ gg_X9
+ 7430:
+ 7440<span class="assem_comment">\ Prompt user</span>
+ 7450:
+ 7460JSR dialog:LDX #3:JSR pestr
+ 7470LDA menuopt_b%:ROL A:LDA #4
+ 7480ADC #0:TAX:JSR pestr
+ 7490:
+ 7500LDX #<b><span class="struct">FN</span></b>lb(prtdn%):LDY #hb:JSR ggprint
+ 7510:
+ 7520LDA #<b><span class="struct">FN</span></b>lb(fname%):STA ggprt+1
+ 7530LDA #hb:STA ggprt+2
+ 7540LDX #<b><span class="struct">FN</span></b>lb(prtfn%):LDY #hb:JSR ggprint
+ 7550:
+ 7560LDA runopt_b%:ROL A:PHA
+ 7570LDA #6:ADC #0:TAX:JSR pestr
+ 7580:
+ 7590PLA:ROL A:LDA #<b>ASC</b>("0"):ADC #0:STA prtds%
+ 7600:
+ 7610LDA runpage_w%:BEQ gg_10
+ 7620LDX #8:LDA runopt_b%:AND #&amp;20
+ 7630BEQ gg_11:INX:.gg_11 JSR pestr
+ 7640:
+ 7650LDX #11:JSR pestr
+ 7660:
+ 7670LDA runpage_w%+1:STA prtpg%+1
+ 7680LDA runpage_w%:STA prtpg%:BNE gg_12
+ 7690:
+ 7700.gg_10 LDX #10:JSR pestr
+ 7710:
+ 7720.gg_12 JSR urdch:BCS gg_9
+ 7730CMP #13:BEQ gg_9
+ 7740CMP #<b>ASC</b>("R"):BNE gg_12
+ 7750.gg_X9
+ 7760LDA menuopt_b%:AND #1:BNE gg_9
+ 7770JMP runfile
+ 7780.gg_9 JSR phead:JMP core2a
+ 7790:
+ 7800.ggprint
+ 7810STX loc_w%:STY loc_w%+1:LDX #0
+ 7820.ggprt
+ 7830LDA &amp;FFFF,X:CMP #13:BEQ ggp_1
+ 7840JSR wchr:INX:BNE ggprt
+ 7850.ggp_1 LDA #<b>ASC</b>("'"):JMP wchr
+ 7860:
+ 7870]:<b>PRINT</b> "gogame ",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 7880:
+ 7890<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_file:T%=P%:[OPT o%
+ 7900:
+ 7910.filelen
+ 7920LDX #<b><span class="struct">FN</span></b>lb(fname%):LDY #hb
+ 7930.filelen2
+ 7940LDA #&amp;40:JSR osfind:TAY:BEQ fl_x
+ 7950:
+ 7960LDX #argsblk%:LDA #2:JSR osargs
+ 7970LDA #0:TAY:JSR osfind
+ 7980LDA argsblk%:ORA argsblk%+1
+ 7990ORA argsblk%+2:ORA argsblk%+3
+ 8000BEQ fl_e:RTS
+ 8010:
+ 8020.fl_x OPT <b><span class="struct">FN</span></b>err("File not found")
+ 8030.fl_e OPT <b><span class="struct">FN</span></b>err("File empty")
+ 8040]:<b>PRINT</b> "file ",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 8050:
+ 8060<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_core:T%=P%:[OPT o%
+ 8070:
+ 8080.ldtab
+ 8090EQUW tabh_w%:EQUW gtab1+1
+ 8100EQUW gtab2+1:EQUW gtab3+1
+ 8110EQUW pagetab+1:EQUW data_w%
+ 8120:
+ 8130.vecs OPT <b><span class="struct">FN</span></b>vecs
+ 8140:
+ 8150.urdch JSR osrdch:BCS uc2
+ 8160.ucase CMP #chra%:BCC uc1
+ 8170CMP #chrz%+1:BCS uc1:EOR #&amp;20
+ 8180.uc1 CLC:.uc2 RTS
+ 8190.mode7 LDA #22:JSR oswrch
+ 8200LDA #7:JMP oswrch
+ 8210:
+ 8220.start
+ 8230LDX #0:LDY #0
+ 8240.ld_2 LDA ldtab,X:STA temp_w%
+ 8250LDA ldtab+1,X:STA temp_w%+1
+ 8260CLC:LDA datalo%+4,X
+ 8270ADC #<b><span class="struct">FN</span></b>lb(datalo%)
+ 8280STA (temp_w%),Y:INX
+ 8290LDA datalo%+4,X:ADC #hb
+ 8300INY:STA (temp_w%),Y
+ 8310DEY:INX:CPX #12:BNE ld_2
+ 8320:
+ 8330LDA datalo%+3:STA gtab+1
+ 8340LDA data_w%:STA pchrtab2+1
+ 8350STA respct1+1:LDA data_w%+1
+ 8360STA pchrtab2+2:STA respct2+1
+ 8370:
+ 8380LDA #4:LDX #1:JSR osbyte
+ 8390LDX #0:STX hi_b%:INX:STX pp_b%
+ 8400:
+ 8410JSR phead
+ 8420:
+ 8430.core1 JSR phead:LDX pp_b%
+ 8440:
+ 8450.core2 STX pp_b%
+ 8460.core2a JSR page
+ 8470.core3 JSR urdch
+ 8480:
+ 8490BIT &amp;FF:BMI cc_x
+ 8500:
+ 8510LDX #veccount-2
+ 8520.cc_1 CMP vecs+1,X:BEQ cc_2
+ 8530DEX:BNE cc_1
+ 8540CMP #chr0%+1:BCC core3
+ 8550CMP #chr9%+1:BCC cc_2
+ 8560DEX:CMP #chrA%:BCC core3
+ 8570CMP #chrZ%+1:BCS core3
+ 8580:
+ 8590.cc_2 INX:TAY
+ 8600LDA vecs+veccount*2,X:PHA
+ 8610LDA vecs+veccount,X:PHA:RTS
+ 8620:
+ 8630.cc_x
+ 8640LDA #&amp;7E:JSR osbyte
+ 8650JSR mode7
+ 8660JMP startbasic
+ 8670:
+ 8680.toginfo
+ 8690LDA menuopt_b%:EOR #&amp;40
+ 8700STA menuopt_b%:ROL A
+ 8710BMI core3:LDA #7:JSR oswrch
+ 8720JMP core3
+ 8730:
+ 8740.left
+ 8750LDX pp_b%:CPX #2:BCC core3
+ 8760DEX:BNE core2
+ 8770:
+ 8780.right
+ 8790LDX pp_b%:CPX pgc_b%:BCS core3
+ 8800INX:BNE core2
+ 8810:
+ 8820.up LDY g_b%:DEY:BEQ core3
+ 8830:
+ 8840LDY hi_b%:BNE up1:LDX pp_b%
+ 8850CPX #2:BCC core3
+ 8860DEX:LDA #&amp;80:STA hi_b%
+ 8870.jcore2 JMP core2
+ 8880:
+ 8890.up1 CPY g_b%:BCC up3:LDY g_b%
+ 8900DEY:.up3 DEY:STY hi_b%
+ 8910JSR rehi:JMP core2a
+ 8920:
+ 8930.jcore3 JMP core3
+ 8940:
+ 8950.down LDY g_b%:DEY:BEQ jcore3
+ 8960:
+ 8970LDY hi_b%:INY:CPY g_b%:BCS do1
+ 8980STY hi_b%:JSR rehi:JMP core3
+ 8990:
+ 9000.do1
+ 9010LDX pp_b%:CPX pgc_b%:BCS jcore3
+ 9020INX:LDY #0:STY hi_b%:BEQ jcore2
+ 9030:
+ 9040.tab JSR urdch:SEC:SBC #1:LDX #0
+ 9050.gtab1 CMP &amp;FFFF,X:BCC gtab3
+ 9060INX:.gtab CPX #0:BNE gtab1
+ 9070.gtab3 LDA &amp;FFFF,X:STA hi_b%
+ 9080.gtab2 LDA &amp;FFFF,X
+ 9090CMP pp_b%:BEQ tab1:TAX:JMP core2
+ 9100.tab1 JSR rehi:JMP core3
+ 9110:
+ 9120.nink LDX #<b><span class="struct">FN</span></b>lb(inkw%):LDY #hb
+ 9130LDA #&amp;81:JSR osbyte:BCS nink1
+ 9140JSR ucase:CLC:.nink1 RTS
+ 9150:
+ 9160.num TYA:SEC:SBC #chr0%:STA no_b%
+ 9170:
+ 9180.numL JSR nink:BCS num1:TXA
+ 9190CPX #chr0%:BCC num3
+ 9200CPX #chr9%+1:BCS num3
+ 9210:
+ 9220SEC:SBC #chr0%:TAX
+ 9230LDA no_b%:CMP #&amp;20:BCS bell
+ 9240ASL A:STA no_b%
+ 9250ASL A:ASL A:CLC:ADC no_b%
+ 9260BCS bell:STA no_b%
+ 9270TXA:ADC no_b%:BCS bell
+ 9280.num5 STA no_b%:BCC numL
+ 9290:
+ 9300.num3
+ 9310TAY:LDX #0:LDA #&amp;99:JSR osbyte
+ 9320:
+ 9330.num1 LDA no_b%:CMP pgc_b%
+ 9340BEQ num2:BCS bell
+ 9350.num2 TAX:JMP core2
+ 9360:
+ 9370.bell LDA #7:JSR oswrch:JMP core3
+ 9380:
+ 9390.az
+ 9400TYA:SEC:SBC #chrA%:STA hi_b%
+ 9410JSR rehi:JMP core3
+ 9420:
+ 9430]:<b>PRINT</b>"core ",P%-T%:<b><span class="struct">ENDPROC</span></b>
+ 9440:
+ 9450<b><span class="struct">DEF</span></b> <b><span class="struct">PROC</span></b>ass_sup:T%=P%:[OPT o%
+ 9460:
+ 9470.dataname EQUS "D.GAMES":EQUB 13
+ 9480.mmb EQUS "DABOUT":EQUB 13
+ 9490.tubeerr OPT <b><span class="struct">FN</span></b>err("Tube on!")
+ 9500.badopt OPT <b><span class="struct">FN</span></b>err("Bad option")
+ 9510:
+ 9520.move LDA (data_w%),Y
+ 9530STA (ptr_w%),Y:INY:BNE move
+ 9540INC ptr_w%+1:INC data_w%+1
+ 9550DEX:BNE move:RTS
+ 9560:
+ 9570.startup
+ 9580STY temp_w%:TSX:STX sptr
+ 9590:
+ 9600LDA #0:STA menuopt_b%
+ 9610LDA #<b>ASC</b>("D"):STA no_b%
+ 9620:
+ 9630LDX #0:LDY #&amp;FF:LDA #&amp;EA
+ 9640JSR osbyte:TXA:BNE tubeerr
+ 9650:
+ 9660LDY temp_w%
+ 9670.params CLC:JSR gsinit:BEQ exargs
+ 9680:
+ 9690CMP #<b>ASC</b>("-"):BNE badopt
+ 9700INY:JSR gsread:BCS badopt
+ 9710CMP #<b>ASC</b>("P"):BEQ popt
+ 9720CMP #<b>ASC</b>("D"):BNE badopt
+ 9730:
+ 9740.dopt
+ 9750JSR gsread:BCS badopt
+ 9760TAX:JSR gsread:BCC badopt
+ 9770STX no_b%:BCS params
+ 9780:
+ 9790.popt
+ 9800JSR gsread:BCC badopt
+ 9810LDA #&amp;40:STA menuopt_b%
+ 9820BCS params
+ 9830:
+ 9840.exargs
+ 9850]:<b><span class="ifthen">IF</span></b> TEST%&gt;0 <b>GOTO</b> <b><span class="linenumber">9980</span></b>
+ 9860[OPT o%
+ 9870LDY #0:STY ptr_w%
+ 9880LDA #4:STA ptr_w%+1
+ 9890LDA #<b><span class="struct">FN</span></b>lb(ldaddr%):STA data_w%
+ 9900LDA #hb:STA data_w%+1
+ 9910LDX #4:JSR move
+ 9920:
+ 9930LDA #&amp;13:STA ptr_w%+1
+ 9940LDA #<b><span class="struct">FN</span></b>lb(hiO%):STA data_w%
+ 9950LDA #hb:STA data_w%+1
+ 9960LDY #0:LDX #hiP%:JSR move
+ 9970]
+ 9980[OPT o%
+ 9990:
+10000LDA no_b%:STA dataname
+10010:
+10020JSR clrkeyb
+10030JSR mode7
+10040LDA #23:JSR oswrch
+10050LDA #1:JSR oswrch
+10060LDX #8:LDA #0:.hcl JSR oswrch
+10070DEX:BNE hcl
+10080:
+10090<span class="assem_comment">\ MMB dfs?</span>
+10100LDX #2:LDA #3:JSR osbyte
+10110LDA #<b><span class="struct">FN</span></b>lb(mmbtest):STA brkv 
+10120LDA #hb:STA brkv+1
+10130LDX #<b><span class="struct">FN</span></b>lb(mmb):LDY #hb:JSR oscli
+10140LDA #0:BEQ usemmb
+10150.mmbtest PLA:PLA:PLA:LDA #&amp;80
+10160.usemmb <b>OR</b>A menuopt_b%
+10170STA menuopt_b%
+10180LDX #0:LDA #3:JSR osbyte
+10190:
+10200LDA #<b><span class="struct">FN</span></b>lb(reporterr):STA brkv
+10210LDA #hb:STA brkv+1
+10220:
+10230<span class="assem_comment">\ data file exists and size ok?</span>
+10240LDX #<b><span class="struct">FN</span></b>lb(dataname):LDY #hb
+10250JSR filelen2:LDA argsblk%+3
+10260ORA argsblk%+2:BNE dataerr
+10270LDA argsblk%+1
+10280CMP #datasz% <b>DIV</b> 256
+10290BCC sup1:BNE dataerr
+10300LDA argsblk%:CMP #datasz% <b>MOD</b> 256
+10310BEQ sup1:BCS dataerr
+10320:
+10330.sup1
+10340LDA #<b><span class="struct">FN</span></b>lb(dataname):STA fileblk%
+10350LDA #hb:STA fileblk%+1
+10360LDA #<b><span class="struct">FN</span></b>lb(datalo%):STA fileblk%+2
+10370LDA #hb:STA fileblk%+3:LDA #0
+10380STA fileblk%+4:STA fileblk%+5
+10390STA fileblk%+6
+10400LDA #(start-1) <b>DIV</b> 256:PHA
+10410LDA #(start-1) <b>MOD</b> 256:PHA
+10420LDX #<b><span class="struct">FN</span></b>lb(fileblk%):LDY #hb
+10430LDA #&amp;FF:JMP osfile
+10440:
+10450.dataerr OPT <b><span class="struct">FN</span></b>err("Data too big")
+10460:
+10470]:<b>PRINT</b>"sup ";P%-T%:<b><span class="struct">ENDPROC</span></b>
+
+</pre>
+
+  </body>
+</html>
